@@ -18,6 +18,14 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": true
-        }
+        },
+        {
+          "name": "plot animation",
+          "type": "python",
+          "request": "launch",
+          "program": "plot_animation.py",
+          "console": "integratedTerminal",
+          "justMyCode": true
+      }
     ]
 }

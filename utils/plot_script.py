@@ -55,10 +55,12 @@ def plot_3d_motion(save_path, kinematic_tree, joints, title, figsize=(10, 10), f
     #         return ax
 
     # (seq_len, joints_num, 3)
-    data = joints.copy().reshape(len(joints), -1, 3)
+    # data = joints.copy().reshape(len(joints), -1, 3)
+    data = joints.copy()
     fig = plt.figure(figsize=figsize)
     ax = p3.Axes3D(fig)
     init()
+    
     MINS = data.min(axis=0).min(axis=0)
     MAXS = data.max(axis=0).max(axis=0)
     colors = ['red', 'blue', 'black', 'red', 'blue',
@@ -73,25 +75,31 @@ def plot_3d_motion(save_path, kinematic_tree, joints, title, figsize=(10, 10), f
 
     data[..., 0] -= data[:, 0:1, 0]
     data[..., 2] -= data[:, 0:1, 2]
+    print(f"data[:, 0:1, :]={data[:, 0:1, :]}")
+    print(f"data={data}, shape={data.shape}")
 
     #     print(trajec.shape)
 
     def update(index):
+    
         #         print(index)
         ax.lines = []
         ax.collections = []
         ax.view_init(elev=120, azim=-90)
         ax.dist = 7.5
+        
+        ax.scatter(joints[index, :, 0], joints[index, :, 1], joints[index, :, 2], color='green', s=5)  #scatter points
+        
         #         ax =
         plot_xzPlane(MINS[0] - trajec[index, 0], MAXS[0] - trajec[index, 0], 0, MINS[2] - trajec[index, 1],
                      MAXS[2] - trajec[index, 1])
-        #         ax.scatter(data[index, :22, 0], data[index, :22, 1], data[index, :22, 2], color='black', s=3)
+        # ax.scatter(data[index, :22, 0], data[index, :22, 1], data[index, :22, 2], color='black', s=3)
 
-        if index > 1:
-            ax.plot3D(trajec[:index, 0] - trajec[index, 0], np.zeros_like(trajec[:index, 0]),
-                      trajec[:index, 1] - trajec[index, 1], linewidth=1.0,
-                      color='blue')
-        #             ax = plot_xzPlane(ax, MINS[0], MAXS[0], 0, MINS[2], MAXS[2])
+        # if index > 1:
+        #     ax.plot3D(trajec[:index, 0] - trajec[index, 0], np.zeros_like(trajec[:index, 0]),
+        #               trajec[:index, 1] - trajec[index, 1], linewidth=1.0,
+        #               color='blue')
+        # #             ax = plot_xzPlane(ax, MINS[0], MAXS[0], 0, MINS[2], MAXS[2])
 
         for i, (chain, color) in enumerate(zip(kinematic_tree, colors)):
             #             print(color)
@@ -101,6 +109,7 @@ def plot_3d_motion(save_path, kinematic_tree, joints, title, figsize=(10, 10), f
                 linewidth = 2.0
             ax.plot3D(data[index, chain, 0], data[index, chain, 1], data[index, chain, 2], linewidth=linewidth,
                       color=color)
+            # print(f"ax.plot3D({data[index, chain, :]})")
         #         print(trajec[:index, 0].shape)
 
         plt.axis('off')
@@ -109,6 +118,7 @@ def plot_3d_motion(save_path, kinematic_tree, joints, title, figsize=(10, 10), f
         ax.set_zticklabels([])
 
     ani = FuncAnimation(fig, update, frames=frame_number, interval=1000 / fps, repeat=False)
+
 
     # writer = FFMpegFileWriter(fps=fps)
     ani.save(save_path, fps=fps)
